@@ -1,0 +1,6 @@
+%implements s6_b0_f8nqp_ModuleVariables "C"
+
+%function ModuleVariables(block) Output
+
+static real_T tmp[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+%endfunction
