@@ -12,8 +12,8 @@
 % Add the required folders to MATLAB's path. This ensures Hecate can find
 % the necessary dependencies. This operation is only needed once but has no
 % side effects if repeated.
-addpath("src")          % Folder containing Hecate source code
-addpath(genpath("staliro"))  % Folder containing S-Taliro and its dependencies
+%addpath("src")          % Folder containing Hecate source code
+%addpath(genpath("staliro"))  % Folder containing S-Taliro and its dependencies
 
 % **Load Initialization Data**
 % If your model requires specific initialization parameters, ensure that
@@ -89,9 +89,10 @@ hecateOpt.sequence_scenario = 'Grafico_Scalino_1';
 % * SpeedLimit_170: Motor speed shall always be lower than 170 rpm.
 % * SpeedLimit_HS: Motor speed shall not exceed that requested by the rider.
 
-hecateOpt.assessment_scenario = 'SpeedLimit_0';
+%hecateOpt.assessment_scenario = 'SpeedLimit_0';
 %hecateOpt.assessment_scenario = 'SpeedLimit_170';
 %hecateOpt.assessment_scenario = 'SpeedLimit_HS';
+hecateOpt.assessment_scenario = 'TorqueLimit_80';
 
 % **Intermediate Results**
 % Enable or disable saving intermediate results. Here, it is disabled to
