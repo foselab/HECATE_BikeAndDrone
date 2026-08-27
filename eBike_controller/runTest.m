@@ -30,8 +30,8 @@ warning("off", 'all')
 % **Simulink Model**
 % Specify the name of the Simulink model to test. Ensure the corresponding
 % .slx file is in the same directory or included in MATLAB's path.
-modelName = 'Buck_model';
-% modelName = 'PWM_model';
+% modelName = 'Buck_model';
+modelName = 'PWM_model';
 
 % **Input Parameters**
 % Define the input parameters used by Hecate.
@@ -58,8 +58,8 @@ hecateOpt = hecate_options();
 % **Optimization Algorithm**
 % Select the search algorithm. Here, we use Uniform Random ('UR_Taliro') 
 % to generate random tests. The default is Simulated Annealing ('SA_Taliro').
-%hecateOpt.optimization_solver = 'UR_Taliro';
-hecateOpt.optimization_solver = 'SA_Taliro';
+hecateOpt.optimization_solver = 'UR_Taliro';
+%hecateOpt.optimization_solver = 'SA_Taliro';
 
 % **Maximum Iterations**
 % Set the maximum number of tests per run.
