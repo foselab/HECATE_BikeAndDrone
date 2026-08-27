@@ -58,7 +58,8 @@ hecateOpt = hecate_options();
 % **Optimization Algorithm**
 % Select the search algorithm. Here, we use Uniform Random ('UR_Taliro') 
 % to generate random tests. The default is Simulated Annealing ('SA_Taliro').
-hecateOpt.optimization_solver = 'UR_Taliro';
+%hecateOpt.optimization_solver = 'UR_Taliro';
+hecateOpt.optimization_solver = 'SA_Taliro';
 
 % **Maximum Iterations**
 % Set the maximum number of tests per run.
@@ -73,9 +74,9 @@ hecateOpt.runs = 10;
 % Scenarios define how parameters vary over time.
 % The models under consideration has six:
 
-hecateOpt.sequence_scenario = 'Grafico_Scalino_1';
+%hecateOpt.sequence_scenario = 'Grafico_Scalino_1';
 %hecateOpt.sequence_scenario = 'Grafico_Scalino_2';
-%hecateOpt.sequence_scenario = 'Grafico_Scalino_3';
+hecateOpt.sequence_scenario = 'Grafico_Scalino_3';
 %hecateOpt.sequence_scenario = 'Grafico_DoppioTronco_1';
 %hecateOpt.sequence_scenario = 'Grafico_DoppioTronco_2';
 %hecateOpt.sequence_scenario = 'Grafico_DoppioTronco_3';
@@ -92,7 +93,7 @@ hecateOpt.sequence_scenario = 'Grafico_Scalino_1';
 %hecateOpt.assessment_scenario = 'SpeedLimit_0';
 %hecateOpt.assessment_scenario = 'SpeedLimit_170';
 %hecateOpt.assessment_scenario = 'SpeedLimit_HS';
-hecateOpt.assessment_scenario = 'TorqueLimit_80';
+hecateOpt.assessment_scenario = 'TorqueLimit_50';
 
 % **Intermediate Results**
 % Enable or disable saving intermediate results. Here, it is disabled to
