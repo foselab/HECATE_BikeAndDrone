@@ -1,6 +1,0 @@
-%implements s5_b0_x3ckm_ModuleVariables "C"
-
-%function ModuleVariables(block) Output
-
-static real_T tmp[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-%endfunction
