@@ -433,7 +433,7 @@ print(f"\nResults saved to: {OUTPUT_FILE.resolve()}")
 
 
 print("--------------------------------")
-print("Data for Box-Plots on EFFICIENCY")
+print("Data for Box-Plots on EFFICIENCY (iterations)")
 print("--------------------------------")
 
 # Convert the required columns to numeric.
@@ -536,3 +536,301 @@ boxplot_statistics = (
 )
 
 print(boxplot_statistics.to_string(index=False))
+
+print("--------------------------------")
+print("Summary data on EFFICIENCY (iterations)")
+print("--------------------------------")
+
+import pandas as pd
+
+# Ensure numerical columns are correctly parsed.
+df["F"] = pd.to_numeric(df["F"], errors="coerce")
+df["S_bar"] = pd.to_numeric(df["S_bar"], errors="coerce")
+
+# Keep valid iteration measurements only.
+iterations = df.loc[
+    (df["F"] > 0)
+    & df["S_bar"].notna()
+    & df["tool"].isin(["HECATE", "S-TaLiRo"])
+].copy()
+
+# Compute descriptive statistics.
+iteration_statistics = (
+    iterations
+    .groupby("tool")["S_bar"]
+    .agg(
+        observations="count",
+        minimum="min",
+        maximum="max",
+        average="mean",
+        standard_deviation="std",  # Sample SD, ddof=1
+    )
+    .reset_index()
+)
+
+print(iteration_statistics.to_string(index=False))
+
+# Optional: save the results.
+iteration_statistics.to_csv(
+    "sbar_descriptive_statistics.csv",
+    sep=";",
+    index=False,
+    float_format="%.6f",
+)
+
+print("--------------------------------")
+print("Statistical test on EFFICIENCY (iterations)")
+print("--------------------------------")
+
+# Exclude F = 0 because S_bar = 0 means no falsification occurred,
+# rather than zero iterations being required.
+valid_data = df.loc[
+    (df["F"] > 0)
+    & df["S_bar"].notna()
+    & df["tool"].isin(["HECATE", "S-TaLiRo"])
+].copy()
+
+staliro = valid_data.loc[
+    valid_data["tool"] == "S-TaLiRo",
+    "S_bar",
+].to_numpy(dtype=float)
+
+hecate = valid_data.loc[
+    valid_data["tool"] == "HECATE",
+    "S_bar",
+].to_numpy(dtype=float)
+iteration_test = mannwhitneyu(
+    staliro,
+    hecate,
+    alternative="two-sided",
+    method="asymptotic",
+    use_continuity=True,
+)
+
+iteration_a12 = vargha_delaney_a12(staliro, hecate)
+
+# Verify consistency between U and A12.
+iteration_a12_from_u = (
+    iteration_test.statistic / (len(staliro) * len(hecate))
+)
+
+if not np.isclose(iteration_a12, iteration_a12_from_u):
+    raise RuntimeError(
+        "A12 consistency check failed for the iteration comparison."
+    )
+
+if np.isclose(iteration_a12, 0.5):
+    iteration_direction = "no tendency"
+elif iteration_a12 > 0.5:
+    iteration_direction = "S-TaLiRo requires more iterations"
+else:
+    iteration_direction = "HECATE requires more iterations"
+
+iteration_test_results = pd.DataFrame([{
+    "comparison": "S-TaLiRo vs HECATE",
+    "metric": "S_bar",
+    "n_staliro": len(staliro),
+    "n_hecate": len(hecate),
+    "mean_staliro": np.mean(staliro),
+    "mean_hecate": np.mean(hecate),
+    "median_staliro": np.median(staliro),
+    "median_hecate": np.median(hecate),
+    "U": iteration_test.statistic,
+    "p_value": iteration_test.pvalue,
+    "A12_staliro_vs_hecate": iteration_a12,
+    "A12_hecate_vs_staliro": 1 - iteration_a12,
+    "effect_direction": iteration_direction,
+    "effect_magnitude": effect_size_magnitude(iteration_a12),
+    "significant_0.05": iteration_test.pvalue < ALPHA,
+}])
+
+print(iteration_test_results.to_string(index=False))
+
+iteration_test_results.to_csv(
+    "sbar_mann_whitney_results.csv",
+    sep=";",
+    index=False,
+    float_format="%.6f",
+)
+
+print("--------------------------------")
+print("Data for Box-Plots on EFFICIENCY (time)")
+print("--------------------------------")
+
+df_time_hecate = pd.read_csv(
+    "times_hecate.csv",
+    header=None,
+    names=["time_seconds"],
+    dtype=float,
+)
+
+df_time_staliro = pd.read_csv(
+    "times_staliro.csv",
+    header=None,
+    names=["time_seconds"],
+    dtype=float,
+)
+
+# Remove missing or non-finite execution times.
+hecate_times = df_time_hecate["time_seconds"].replace(
+    [np.inf, -np.inf], np.nan
+).dropna()
+
+staliro_times = df_time_staliro["time_seconds"].replace(
+    [np.inf, -np.inf], np.nan
+).dropna()
+
+# Execution times cannot be negative.
+if (hecate_times < 0).any():
+    raise ValueError("times_hecate.csv contains negative execution times.")
+
+if (staliro_times < 0).any():
+    raise ValueError("times_staliro.csv contains negative execution times.")
+
+# Calculate the boxplot statistics using the existing function.
+time_boxplot_rows = []
+
+for tool, values in [
+    ("HECATE", hecate_times),
+    ("S-TaLiRo", staliro_times),
+]:
+    time_boxplot_rows.append({
+        "tool": tool,
+        **calculate_boxplot_statistics(values),
+    })
+
+time_boxplot_statistics = pd.DataFrame(time_boxplot_rows)
+
+# Preserve the HECATE, S-TaLiRo plotting order.
+time_boxplot_statistics["_order"] = (
+    time_boxplot_statistics["tool"].map(tool_order)
+)
+
+time_boxplot_statistics = (
+    time_boxplot_statistics
+    .sort_values("_order")
+    .drop(columns="_order")
+    .reset_index(drop=True)
+)
+
+print(time_boxplot_statistics.to_string(index=False))
+
+time_boxplot_statistics.to_csv(
+    "time_boxplot_statistics.csv",
+    sep=";",
+    index=False,
+    float_format="%.6f",
+)
+
+print("--------------------------------")
+print("Summary data on EFFICIENCY (time)")
+print("--------------------------------")
+
+time_summary_rows = []
+
+for tool, values in [
+    ("HECATE", hecate_times),
+    ("S-TaLiRo", staliro_times),
+]:
+    time_summary_rows.append({
+        "tool": tool,
+        "observations": len(values),
+        "minimum_seconds": values.min(),
+        "maximum_seconds": values.max(),
+        "average_seconds": values.mean(),
+        "standard_deviation_seconds": values.std(ddof=1),
+    })
+
+time_statistics = pd.DataFrame(time_summary_rows)
+
+# Preserve the desired tool order.
+time_statistics["_order"] = time_statistics["tool"].map(tool_order)
+
+time_statistics = (
+    time_statistics
+    .sort_values("_order")
+    .drop(columns="_order")
+    .reset_index(drop=True)
+)
+
+print(time_statistics.to_string(index=False))
+
+time_statistics.to_csv(
+    "time_descriptive_statistics.csv",
+    sep=";",
+    index=False,
+    float_format="%.6f",
+)
+
+print("--------------------------------")
+print("Statistical test on EFFICIENCY (time)")
+print("--------------------------------")
+
+# Convert the existing Series to NumPy arrays.
+staliro_time_values = staliro_times.to_numpy(dtype=float)
+hecate_time_values = hecate_times.to_numpy(dtype=float)
+
+if len(staliro_time_values) < 2 or len(hecate_time_values) < 2:
+    raise ValueError(
+        "At least two valid time observations are required for each tool."
+    )
+
+# Two-sided Mann–Whitney U-test.
+time_test = mannwhitneyu(
+    staliro_time_values,
+    hecate_time_values,
+    alternative="two-sided",
+    method="asymptotic",
+    use_continuity=True,
+)
+
+# A12 from the S-TaLiRo perspective.
+time_a12 = vargha_delaney_a12(
+    staliro_time_values,
+    hecate_time_values,
+)
+
+# U/(n1*n2) should equal A12 when S-TaLiRo is the first sample.
+time_a12_from_u = time_test.statistic / (
+    len(staliro_time_values) * len(hecate_time_values)
+)
+
+if not np.isclose(time_a12, time_a12_from_u):
+    raise RuntimeError(
+        "A12 consistency check failed for the execution-time comparison."
+    )
+
+# For execution time, higher values mean worse performance.
+if np.isclose(time_a12, 0.5):
+    time_direction = "no tendency"
+elif time_a12 > 0.5:
+    time_direction = "S-TaLiRo requires more time"
+else:
+    time_direction = "HECATE requires more time"
+
+time_test_results = pd.DataFrame([{
+    "comparison": "S-TaLiRo vs HECATE",
+    "metric": "execution_time_seconds",
+    "n_staliro": len(staliro_time_values),
+    "n_hecate": len(hecate_time_values),
+    "mean_staliro_seconds": np.mean(staliro_time_values),
+    "mean_hecate_seconds": np.mean(hecate_time_values),
+    "median_staliro_seconds": np.median(staliro_time_values),
+    "median_hecate_seconds": np.median(hecate_time_values),
+    "U": time_test.statistic,
+    "p_value": time_test.pvalue,
+    "A12_staliro_vs_hecate": time_a12,
+    "A12_hecate_vs_staliro": 1 - time_a12,
+    "effect_direction": time_direction,
+    "effect_magnitude": effect_size_magnitude(time_a12),
+    "significant_0.05": time_test.pvalue < ALPHA,
+}])
+
+print(time_test_results.to_string(index=False))
+
+time_test_results.to_csv(
+    "time_mann_whitney_results.csv",
+    sep=";",
+    index=False,
+    float_format="%.6f",
+)

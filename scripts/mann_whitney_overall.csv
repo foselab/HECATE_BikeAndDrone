@@ -1,0 +1,2 @@
+comparison;n_staliro;n_hecate;mean_rate_staliro;mean_rate_hecate;median_rate_staliro;median_rate_hecate;rate_difference;U;p_value;A12_staliro_vs_hecate;A12_hecate_vs_staliro;effect_direction;effect_magnitude;significant_0.05
+S-TaLiRo vs HECATE;38;102;0.736842;0.823529;1.000000;1.000000;-0.086687;1697.000000;0.128973;0.437822;0.562178;HECATE higher;small;False

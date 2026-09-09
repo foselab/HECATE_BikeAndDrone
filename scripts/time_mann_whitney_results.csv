@@ -1,0 +1,2 @@
+comparison;metric;n_staliro;n_hecate;mean_staliro_seconds;mean_hecate_seconds;median_staliro_seconds;median_hecate_seconds;U;p_value;A12_staliro_vs_hecate;A12_hecate_vs_staliro;effect_direction;effect_magnitude;significant_0.05
+S-TaLiRo vs HECATE;execution_time_seconds;41;835;529.398717;277.539360;135.755387;77.588894;20708.000000;0.023232;0.604878;0.395122;S-TaLiRo requires more time;small;True

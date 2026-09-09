@@ -1,0 +1,7 @@
+case_study;algorithm;model;n_staliro;n_hecate;mean_rate_staliro;mean_rate_hecate;median_rate_staliro;median_rate_hecate;rate_difference;U;p_value;A12;effect_direction;effect_magnitude;status;p_value_holm;significant_raw;significant_holm
+Drone;SA;not_applicable;3;3;0.066667;0.066667;0.100000;0.000000;0.000000;5.000000;1.000000;0.555556;S-TaLiRo higher;negligible;tested;1.000000;False;False
+Drone;UR;not_applicable;3;3;0.400000;0.300000;0.300000;0.100000;0.100000;6.000000;0.642835;0.666667;S-TaLiRo higher;medium;tested;1.000000;False;False
+eBike;SA;Buck;8;24;0.750000;0.750000;1.000000;1.000000;0.000000;96.000000;1.000000;0.500000;no tendency;negligible;tested;1.000000;False;False
+eBike;SA;PWM;8;24;0.900000;1.000000;1.000000;1.000000;-0.100000;72.000000;0.014816;0.375000;HECATE higher;small;tested;0.088898;True;False
+eBike;UR;Buck;8;24;0.750000;0.704167;1.000000;1.000000;0.045833;102.000000;0.768279;0.531250;S-TaLiRo higher;negligible;tested;1.000000;False;False
+eBike;UR;PWM;8;24;0.925000;1.000000;1.000000;1.000000;-0.075000;84.000000;0.096938;0.437500;HECATE higher;small;tested;0.484691;False;False
